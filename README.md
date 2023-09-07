@@ -1,4 +1,5 @@
 # <img src="/assets/icon.ico" width="35px" /> MYC - My Yuzu Companion
+[Releases](https://github.com/Ciross/MYC/releases)
 
 **MYC** (*My Yuzu Comapnion*) is an utility software that will helps you trough your Yuzu experience.  
  Helping you to install it trough an installer (with Yuzu Early Access available)
