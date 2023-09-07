@@ -8,7 +8,7 @@ It will provide you **auto-updater** for the *firmware* and *keys*!
  Also there's an **auto-starter** for your yuzu application, that will waits for updates before starting yuzu!  
  That mean, that you can start MYC instead of yuzu, he will update (if needed) and launch yuzu after!
 
-### [Download MYC](https://github.com/Ciross/MYC/releases)
+### [Download MYC](https://github.com/Ciross/MYC/releases/latest)
 
 Features
 --------
