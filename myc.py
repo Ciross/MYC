@@ -1,16 +1,17 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QComboBox, QCheckBox, QLabel, QMessageBox
 from PyQt6.QtCore import Qt, QCoreApplication, QSettings, QSize, QTimer
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
-from PyQt6 import QtGui, uic
-import sys, os, shutil, subprocess, requests, zipfile, time, psutil
+from PyQt6 import uic
+import sys, os, subprocess, time, psutil, requests
 from threads.yuzu import YuzuLoader, YuzuInstaller
 from threads.firmware import FirmwareLoader, FirmwareUpdater
 from threads.keys import KeysLoader, KeysUpdater
-from threads.utils import SettingsLoader
+from threads.utils import SettingsLoader, UpdateChecker
 
 class MYC(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.version = '1.0.0'
         if getattr(sys, 'frozen', False):
             self.bundle_dir = sys._MEIPASS
         else:
@@ -27,6 +28,9 @@ class MYC(QMainWindow):
             QMessageBox.critical(self, 'Error', f'Failed to load local appdata.<br>{e}')
             sys.exit(0)
         self.credits = Credits()
+        self.updateChecker = UpdateChecker(self.version)
+        self.updateChecker.finished.connect(self.updateMYC)
+        self.updating = False
         self.yuzuLoader = YuzuLoader()
         self.yuzuLoader.finished.connect(self.yuzuLoaded)
         self.yuzuLoader.failed.connect(self.yuzuNotLoaded)
@@ -77,6 +81,7 @@ class MYC(QMainWindow):
         self.loadApp()
 
     def loadApp(self):
+        self.updateChecker.start()
         self.yuzuLoader.start()
         self.firmwareLoader.start()
         self.keysLoader.start()
@@ -98,6 +103,8 @@ class MYC(QMainWindow):
         self.autoUpdateFirmware.setEnabled(True)
         self.autoUpdateKeys.setChecked(self.settings.value('autoUpdateKeys', False, bool))
         self.autoUpdateKeys.setEnabled(True)
+        if self.updating:
+            return
         if self.autoStart.isChecked():
             self.autoStarter = True
         if self.autoUpdateKeys.isChecked():
@@ -130,6 +137,70 @@ class MYC(QMainWindow):
         box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         box.setDefaultButton(QMessageBox.StandardButton.No)
         return box.exec() == QMessageBox.StandardButton.Yes
+    
+    def updateMYC(self, update):
+        if not update:
+            print('MYC is up to date!')
+            return
+        if not getattr(sys, 'frozen', False):
+            QMessageBox.critical(self, 'Error', 'An update is available but MYC is not installed.<br>Please install MYC and try again.')
+            return
+        localappdata = os.environ.get('LOCALAPPDATA')
+        if localappdata is None:
+            QMessageBox.critical(self, 'Error', 'Failed to find LocalAppData directory.<br>Please try again.')
+            return
+        self.updating = True
+        url = "https://api.github.com/repos/Ciross/MYC/releases/latest"
+        print('Fetching latest version...')
+        try:
+            res = requests.get(url)
+        except Exception as e:
+            QMessageBox.critical(self, 'Error', f'Failed to establish a connection with the server.<br>Verify your internet connection and try again.<br>{e}')
+            return
+        if res.status_code != 200:
+            QMessageBox.critical(self, 'Error', 'Failed to fetch latest version.<br>Please try again.')
+            return
+        try:
+            print('Getting download url...')
+            url = res.json()['assets'][0]['browser_download_url']
+        except Exception as e:
+            QMessageBox.critical(self, 'Error', f'Failed to fetch download url.<br>{e}')
+            return
+        print('Downloading update...')
+        try:
+            res = requests.get(url)
+            with open(os.path.join(localappdata, 'MYC', 'MYC-new.exe'), 'wb') as f:
+                f.write(res.content)
+        except Exception as e:
+            QMessageBox.critical(self, 'Error', f'Failed to download update.<br>{e}')
+            return
+        print('Starting update...')
+        if self.askBox('Update Available', 'MYC update is available.<br>Do you want to update now?'):
+            app = os.path.abspath(sys.executable)
+            new_app = os.path.join(localappdata, 'MYC', 'MYC-new.exe')
+            updater = f"""@echo off
+echo Waiting for the application to close...
+timeout /t 5 /nobreak
+
+set OLD_APP_PATH={app}
+set NEW_APP_PATH={new_app}
+
+echo Deleting old application...
+del %OLD_APP_PATH%
+
+echo Moving new application to old application's location...
+move %NEW_APP_PATH% %OLD_APP_PATH%
+
+echo Update completed.
+echo Starting new application...
+start "" %OLD_APP_PATH%
+"""
+            with open(os.path.join(localappdata, 'MYC', 'MYC-updater.bat'), 'w') as f:
+                f.write(updater)
+            print('Starting updater...')
+            subprocess.Popen(f'"{os.path.join(localappdata, "MYC", "MYC-updater.bat")}"')
+            print('Closing MYC...')
+            sys.exit(0)
 
     def autoStartYuzu(self):
         self.countdown -= 1
