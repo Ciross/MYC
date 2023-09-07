@@ -57,3 +57,8 @@ pyinstaller --add-data "assets/icon.ico;assets/" --add-data "ui/credits.ui;ui/" 
 ```
 
 - Now you will find the builded `MYC.exe` in the `dist/` folder
+
+License
+-------
+
+MYC is licensed under the Apache 2.0 License, which can be found in [LICENSE](LICENSE).
