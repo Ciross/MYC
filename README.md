@@ -58,6 +58,11 @@ pyinstaller --add-data "assets/icon.ico;assets/" --add-data "ui/credits.ui;ui/" 
 
 - Now you will find the builded `MYC.exe` in the `dist/` folder
 
+Contributing
+------------
+
+Feel free to make push requests if you have any ideas!
+
 License
 -------
 
