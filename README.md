@@ -38,7 +38,7 @@ How to build the source code?
 - First you will need to install [**Python 3**](https://www.python.org/downloads/)  
   Make sure to add Python to PATH when downloading it!
 - Then open a `cmd` or `powershell` in the project directory,  
-  and then install all depedencies by running this command
+  and install all depedencies by running this command
 
 ```bash
 pip install -r requirements.txt
