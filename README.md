@@ -14,7 +14,7 @@ Features
 --------
 
 - 🍋 **Yuzu Installer**  
- Install **Yuzu** nor **Yuzu Early Access** using the installer.
+ Install **Yuzu** and/or **Yuzu Early Access** using the installer.
 
 - ▶️ **Yuzu Starter**  
  Start your yuzu application using **MYC**.
