@@ -11,7 +11,7 @@ from threads.utils import SettingsLoader, UpdateChecker
 class MYC(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.0'
+        self.version = '1.0.1'
         if getattr(sys, 'frozen', False):
             self.bundle_dir = sys._MEIPASS
         else:
