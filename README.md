@@ -39,7 +39,7 @@ Building
 
 How to build the source code?
 - First you will need to install [**Python 3**](https://www.python.org/downloads/)  
-  Make sure to add Python to PATH when downloading it!
+  Make sure to add Python to PATH when installing it!
 - Then open a `cmd` or `powershell` in the project directory,  
   and install all depedencies by running this command
 
