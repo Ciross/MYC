@@ -179,7 +179,10 @@ class MYC(QMainWindow):
             app = os.path.abspath(sys.executable)
             new_app = os.path.join(localappdata, 'MYC', 'MYC-new.exe')
             updater = f"""@echo off
-echo Waiting for the application to close...
+title MYC - Updater
+echo Welcome to MYC - Updater
+echo.
+echo Waiting for MYC to close...
 timeout /t 5 /nobreak
 
 set OLD_APP_PATH={app}
